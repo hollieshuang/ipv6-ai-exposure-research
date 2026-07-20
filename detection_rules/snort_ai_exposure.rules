@@ -1,0 +1,294 @@
+# =============================================================================
+# IPv6 AI Infrastructure Exposure Detection Rules
+# Snort/Suricata Compatible Format
+# Version: 1.0.0
+# Date: 2026-07-20
+# License: MIT License
+# =============================================================================
+# 
+# DESCRIPTION:
+# This rule set detects unauthorized access attempts to AI infrastructure
+# services exposed on IPv6 networks, including Ollama, gRPC, vLLM, and
+# agent frameworks like OpenClaw.
+#
+# USAGE:
+#   Snort:  snort -c snort_ai_exposure.rules -i eth0
+#   Suricata: suricata -c . -i eth0
+#
+# REQUIREMENTS:
+#   - Snort 2.9.x+ or Suricata 6.x+
+#   - IPv6 support enabled
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SECTION 1: Ollama Detection Rules (Ports 11434, 7000)
+# -----------------------------------------------------------------------------
+
+# Rule 9000001: Ollama Model Enumeration (GET /api/tags)
+# Severity: HIGH
+# Description: Detects unauthenticated model list retrieval from Ollama API
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA Unauthenticated Model Enumeration";
+    content:"GET /api/tags"; nocase;
+    content:"Host|3a| localhost"; nocase;
+    reference:url,github.com/ollama/ollama;
+    classtype:attempted-recon;
+    sid:9000001;
+    rev:1;
+)
+
+# Rule 9000002: Ollama Inference Abuse (POST /api/generate)
+# Severity: CRITICAL
+# Description: Detects inference generation requests to Ollama
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA Inference Abuse Detected";
+    content:"POST /api/generate"; nocase;
+    reference:url,github.com/ollama/ollama/blob/main/docs/api.md;
+    classtype:attempted-user;
+    sid:9000002;
+    rev:1;
+)
+
+# Rule 9000003: Ollama Model Download (POST /api/pull)
+# Severity: CRITICAL
+# Description: Detects model download attempts
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA Model Download Attempt";
+    content:"POST /api/pull"; nocase;
+    reference:url,cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-37032;
+    classtype:attempted-admin;
+    sid:9000003;
+    rev:1;
+)
+
+# Rule 9000004: Ollama Version Disclosure (GET /api/version)
+# Severity: MEDIUM
+# Description: Detects version information leakage
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA Version Information Disclosure";
+    content:"GET /api/version"; nocase;
+    reference:url,github.com/ollama/ollama/security;
+    classtype:attempted-recon;
+    sid:9000004;
+    rev:1;
+)
+
+# Rule 9010015: Ollama RCE Exploitation (CVE-2024-37032)
+# Severity: CRITICAL
+# Description: Detects path traversal attempts for RCE
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA CVE-2024-37032 Path Traversal/RCE Attempt";
+    pcre:"/(\.\.\/|\.\.%2f|%2e%2e)/i";
+    reference:cve,2024-37032;
+    reference:url,github.com/ollama/ollama/security/advisories/GHSA-xxxx;
+    classtype:web-application-attack;
+    sid:9000015;
+    rev:1;
+)
+
+# Rule 9010016: Ollama Arbitrary File Read (CVE-2024-39720)
+# Severity: HIGH
+# Description: Detects file read attempts via API
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA CVE-2024-39720 Arbitrary File Read Attempt";
+    content:"GET /api/read"; nocase;
+    pcre:"/filename=|\/..\/|\.\.%2f/";
+    reference:cve,2024-39720;
+    classtype:web-application-attack;
+    sid:9000016;
+    rev:1;
+)
+
+# Rule 9010014: Ollama DoS (High-frequency requests)
+# Severity: MEDIUM
+# Description: Detects high-frequency API requests (potential DoS)
+alert tcp any any -> $HOME_NET [11434,7000] (
+    msg:"AI OLLAMA Potential DoS Attack (High-frequency Requests)";
+    content:"POST /api/"; nocase;
+    threshold:type threshold, track by_src, count 50, seconds 60;
+    reference:url,github.com/ollama/ollama;
+    classtype:denial-of-service;
+    sid:9000014;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 2: gRPC Detection Rules (Port 50051)
+# -----------------------------------------------------------------------------
+
+# Rule 9000005: gRPC HTTP/2 Connection Probe
+# Severity: MEDIUM
+# Description: Detects HTTP/2 connection preface for gRPC
+alert tcp any any -> $HOME_NET 50051 (
+    msg:"AI gRPC Inference Server Connection Probe";
+    content:"|00 00 00|"; depth:3;
+    content:"PRI * HTTP/2"; nocase;
+    reference:url,grpc.io;
+    classtype:attempted-recon;
+    sid:9000005;
+    rev:1;
+)
+
+# Rule 9000006: gRPC Plaintext Transmission (No TLS)
+# Severity: HIGH
+# Description: Detects unencrypted gRPC traffic
+alert tcp any any -> $HOME_NET 50051 (
+    msg:"AI gRPC Plaintext Traffic (No TLS Encryption)";
+    content:"|00 00|";
+    content:!"application/grpc+tls";
+    reference:url,grpc.io/docs/guides/auth;
+    classtype:policy-violation;
+    sid:9000006;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 3: OpenClaw/Agent Framework Detection (Ports 18789, 18798, 28789, 56767)
+# -----------------------------------------------------------------------------
+
+# Rule 9000007: OpenClaw Endpoint Exposure
+# Severity: MEDIUM
+# Description: Detects OpenClaw agent endpoint traffic
+alert tcp any any -> $HOME_NET [18789,18798,28789,56767] (
+    msg:"AI OpenClaw Agent Framework Endpoint Detected";
+    content:"GET /"; nocase;
+    content:"User-Agent|3a| OpenClaw"; nocase;
+    reference:url,openclaw.ai;
+    classtype:application-unknown;
+    sid:9000007;
+    rev:1;
+)
+
+# Rule 9000008: OpenClaw WebSocket Connection
+# Severity: HIGH
+# Description: Detects WebSocket connections to OpenClaw
+alert tcp any any -> $HOME_NET [18789,18798,28789,56767] (
+    msg:"AI OpenClaw WebSocket Connection Attempt";
+    content:"Upgrade|3a| websocket"; nocase;
+    content:"Sec-WebSocket-Key|3a|"; nocase;
+    reference:url,openclaw.ai/docs;
+    classtype:attempted-user;
+    sid:9000008;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 4: vLLM/FastAPI Detection (Ports 8000, 8888)
+# -----------------------------------------------------------------------------
+
+# Rule 9000009: vLLM Model Enumeration
+# Severity: HIGH
+# Description: Detects vLLM model list retrieval
+alert tcp any any -> $HOME_NET [8000,8888] (
+    msg:"AI vLLM Model Enumeration (/v1/models)";
+    content:"GET /v1/models"; nocase;
+    content:"Host|3a| localhost"; nocase;
+    reference:url,docs.vllm.ai;
+    classtype:attempted-recon;
+    sid:9000009;
+    rev:1;
+)
+
+# Rule 9000010: vLLM Inference Abuse
+# Severity: CRITICAL
+# Description: Detects inference requests to vLLM
+alert tcp any any -> $HOME_NET [8000,8888] (
+    msg:"AI vLLM Inference Abuse Detected";
+    content:"POST /v1/chat/completions"; nocase;
+    content:"model|3a|"; nocase;
+    reference:url,docs.vllm.ai/en/latest/serving/openai_compatible_server.html;
+    classtype:attempted-user;
+    sid:9000010;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 5: AI Web/Gradio Detection (Ports 7860, 8501)
+# -----------------------------------------------------------------------------
+
+# Rule 9000011: AI Web Service Exposure (Flask/Gradio/Streamlit)
+# Severity: MEDIUM
+# Description: Detects AI web interface exposure
+alert tcp any any -> $HOME_NET [7860,8501] (
+    msg:"AI Web Interface Exposure Detected";
+    content:"GET /"; nocase;
+    content:"Host|3a| localhost"; nocase;
+    pcre:"/gradio|streamlit|flask/i";
+    reference:url,gradio.app;
+    classtype:application-unknown;
+    sid:9000011;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 6: Database + AI Co-exposure Detection
+# -----------------------------------------------------------------------------
+
+# Rule 9000012: MySQL + AI Co-exposure (CRITICAL)
+# Severity: CRITICAL
+# Description: Detects hosts with both MySQL and AI services exposed
+# Note: Requires correlation across multiple alerts
+alert tcp any any -> $HOME_NET 3306 (
+    msg:"AI Database+AI Co-exposure Detected (MySQL)";
+    content:"Host|27| is not allowed"; nocase;
+    reference:url,github.com/ollama/ollama;
+    classtype:policy-violation;
+    sid:9000012;
+    rev:1;
+)
+
+# Rule 9000013: Redis + AI Co-exposure
+# Severity: HIGH
+# Description: Detects hosts with both Redis and AI services exposed
+alert tcp any any -> $HOME_NET 6379 (
+    msg:"AI Redis+AI Co-exposure Detected";
+    content:"-DENIED"; nocase;
+    reference:url,redis.io/docs/security;
+    classtype:policy-violation;
+    sid:9000013;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# SECTION 7: Generic IPv6 AI Scanning Detection
+# -----------------------------------------------------------------------------
+
+# Rule 9000017: IPv6 AI Service Scanning Pattern
+# Severity: MEDIUM
+# Description: Detects systematic scanning for AI services on IPv6
+# Note: May generate false positives, tune threshold as needed
+alert tcp $EXTERNAL_NET any -> $HOME_NET [11434,50051,18789,18798,28789,56767] (
+    msg:"AI IPv6 AI Service Scanning Pattern Detected";
+    flags:S,12;
+    threshold:type threshold, track by_src, count 20, seconds 120;
+    reference:url,github.com/ipv6-ai-exposure-research;
+    classtype:attempted-recon;
+    sid:9000017;
+    rev:1;
+)
+
+# -----------------------------------------------------------------------------
+# END OF RULES
+# -----------------------------------------------------------------------------
+#
+# CONFIGURATION NOTES:
+#   - Replace $HOME_NET with your internal network range
+#   - Adjust thresholds based on your environment
+#   - Enable/disable rules based on your deployment
+#
+# VARIABLES:
+#   $HOME_NET - Your internal network (e.g., [2402:e740::/32,192.168.0.0/16])
+#   $EXTERNAL_NET - External networks
+#
+# TROUBLESHOOTING:
+#   - If you see false positives, increase threshold counts
+#   - For performance, disable unused service categories
+#   - Ensure IPv6 is enabled in Snort/Suricata config
+#
+# UPDATES:
+#   - Check for new CVEs regularly
+#   - Update reference URLs
+#   - Review and tune thresholds quarterly
+#
+# =============================================================================

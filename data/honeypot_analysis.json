@@ -1,0 +1,54 @@
+{
+  "analysis_date": "2026-07-18",
+  "method": "Port exposure entropy analysis",
+  "threshold": {
+    "normalized_entropy": 0.9,
+    "aliasing_factor": 3.0,
+    "min_ip_port_pairs": 1000
+  },
+  "detected_honeypots": [
+    {
+      "prefix": "fffe::/16",
+      "normalized_entropy": 0.9471,
+      "aliasing_factor": 3.2,
+      "total_hosts": 4120,
+      "total_ai_ports": 8240,
+      "confidence": "HIGH",
+      "notes": "Extremely uniform port distribution across all AI service ports"
+    },
+    {
+      "prefix": "col0::/24",
+      "normalized_entropy": 0.9134,
+      "aliasing_factor": 2.8,
+      "total_hosts": 3150,
+      "total_ai_ports": 6310,
+      "confidence": "HIGH",
+      "notes": "Synthetic-looking exposure pattern"
+    },
+    {
+      "prefix": "one1::/24",
+      "normalized_entropy": 0.9215,
+      "aliasing_factor": 2.6,
+      "total_hosts": 1979,
+      "total_ai_ports": 3571,
+      "confidence": "MEDIUM",
+      "notes": "Possible research honeypot network"
+    }
+  ],
+  "real_networks": [
+    {
+      "prefix": "2402:e740::/32",
+      "normalized_entropy": 0.5641,
+      "aliasing_factor": 1.10,
+      "total_hosts": 1347,
+      "notes": "CERNET2 research network - authentic data"
+    }
+  ],
+  "global_impact": {
+    "total_ai_exposure_global": 18931,
+    "honeypot_attributed": 0.60_to_0.96,
+    "estimated_real_exposure": 7740,
+    "note": "60%-96% of global AI exposure attributed to honeypot networks"
+  },
+  "mitigation_recommendation": "Exclude detected honeypot prefixes from real-exposure baseline calculations to avoid inflating statistics."
+}

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this research or code, please cite it as below."
+type: software
+title: "IPv6 AI Infrastructure Exposure Measurement"
+version: 1.0.0
+date-released: 2026-07-20
+authors:
+  - name: "IPv6 AI Exposure Measurement Research Group"
+    affiliation: "Anonymous"
+abstract: >
+  This repository contains the first systematic measurement of IPv6 AI 
+  infrastructure exposure, including detection rules, analysis scripts, 
+  and anonymized datasets from our research on AI service security in 
+  IPv6 networks.
+keywords:
+  - ipv6
+  - ai-security
+  - llm
+  - ollama
+  - network-measurement
+  - intrusion-detection
+license: MIT
+repository-code: "https://github.com/[your-username]/ipv6-ai-exposure-research"
+type: software

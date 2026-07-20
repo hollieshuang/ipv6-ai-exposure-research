@@ -1,0 +1,79 @@
+{
+  "period": "2026-07-11 to 2026-07-18",
+  "network": "CERNET2",
+  "snapshots": 4,
+  "snapshot_dates": ["2026-07-11", "2026-07-12", "2026-07-13", "2026-07-18"],
+  "trends": {
+    "total_exposed_ips": {
+      "values": [1150, 1180, 1205, 1347],
+      "start": 1150,
+      "end": 1347,
+      "change_pct": 17.1,
+      "trend": "increasing",
+      "stability_score": 0.82
+    },
+    "ollama": {
+      "values": [3, 3, 4, 4],
+      "start": 3,
+      "end": 4,
+      "change_pct": 33.3,
+      "trend": "increasing",
+      "stability_score": 0.91
+    },
+    "grpc_ai": {
+      "values": [34, 32, 31, 30],
+      "start": 34,
+      "end": 30,
+      "change_pct": -11.8,
+      "trend": "decreasing",
+      "stability_score": 0.88
+    },
+    "ai_web": {
+      "values": [1029, 1050, 1060, 1067],
+      "start": 1029,
+      "end": 1067,
+      "change_pct": 3.7,
+      "trend": "stable",
+      "stability_score": 0.95
+    },
+    "ai_ports_total": {
+      "values": [769, 785, 795, 802],
+      "start": 769,
+      "end": 802,
+      "change_pct": 8.7,
+      "trend": "increasing",
+      "stability_score": 0.89
+    }
+  },
+  "alert_summary": {
+    "total_alerts": 0,
+    "high_severity": 0,
+    "medium_severity": 0,
+    "low_severity": 0,
+    "status": "NORMAL - No anomalies detected"
+  },
+  "cross_prefix_comparison": {
+    "total_prefixes_analyzed": 11,
+    "network_types": {
+      "honeypot": {
+        "prefixes": ["fffe::/16", "col0::/24", "one1::/24"],
+        "avg_entropy": 0.7271,
+        "avg_aliasing": 2.24,
+        "ai_exposure_share": 0.607
+      },
+      "commercial": {
+        "prefixes": ["nda8::/24", "n250::/24", "24d4::/24"],
+        "avg_entropy": 0.6428,
+        "avg_aliasing": 1.18,
+        "ai_exposure_share": 0.216
+      },
+      "research": {
+        "prefixes": ["2402::/16", "8000::/16", "d215::/16", "d800::/16"],
+        "avg_entropy": 0.5641,
+        "avg_aliasing": 1.10,
+        "ai_exposure_share": 0.177
+      }
+    }
+  },
+  "methodology_note": "Anonymized longitudinal tracking with 72-hour scan cycle. Honeypot networks excluded from real-exposure estimates."
+}

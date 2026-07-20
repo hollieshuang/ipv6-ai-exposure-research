@@ -1,0 +1,63 @@
+{
+  "snapshot_date": "2026-07-18",
+  "network": "CERNET2",
+  "scan_scope": {
+    "total_ipv6_addresses_scanned": 530000,
+    "unique_exposed_ips": 1347,
+    "total_ai_port_records": 1139,
+    "ai_port_ratio": 0.845
+  },
+  "services": {
+    "ai_web": {
+      "count": 1067,
+      "ports": [5000, 8501, 7860],
+      "risk_level": "LOW",
+      "notes": "Mostly development environments (Flask/Streamlit/Gradio)"
+    },
+    "grpc_ai": {
+      "count": 30,
+      "ports": [50051],
+      "risk_level": "MODERATE",
+      "notes": "Inference backends (Triton/gRPC)"
+    },
+    "ollama": {
+      "count": 4,
+      "ports": [11434],
+      "risk_level": "HIGH",
+      "notes": "LLM framework, 3 confirmed unauthenticated"
+    },
+    "openclaw": {
+      "count": 3,
+      "ports": [18789, 18798, 28789],
+      "risk_level": "LOW",
+      "notes": "Agent framework endpoints"
+    },
+    "other_ai": {
+      "count": 35,
+      "ports": [8000, 8888, 56767],
+      "risk_level": "LOW",
+      "notes": "vLLM/FastAPI/QClaw"
+    }
+  },
+  "risk_assessment": {
+    "high_risk_hosts": 4,
+    "moderate_risk_hosts": 30,
+    "low_risk_hosts": 1313,
+    "critical_findings": [
+      "3 Ollama instances with unauthenticated model enumeration",
+      "Average exposure window of 35 hours before mitigation"
+    ]
+  },
+  "attack_cost": {
+    "scan_100_prefixes_minutes": 1.5,
+    "cost_level": "CRITICAL",
+    "description": "Extremely low cost to discover AI services in IPv6 prefixes"
+  },
+  "persistence": {
+    "overall_persistence_rate": 0.23,
+    "grpc_persistence_rate": 0.737,
+    "ollama_persistence_rate": 1.0,
+    "ai_web_persistence_rate": 0.097
+  },
+  "anonymization_note": "IP addresses partially redacted. Prefixes preserved for research reproducibility."
+}
