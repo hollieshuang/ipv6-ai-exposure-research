@@ -14,17 +14,6 @@
 
 This repository contains the **first systematic measurement** of IPv6 AI infrastructure exposure, including detection rules, analysis scripts, and datasets from our research published .
 
-### Key Findings
-
-| Metric | Value |
-|--------|-------|
-| Exposed AI Endpoints | 1k |
-| Ollama Servers | * (11434/tcp) |
-| gRPC AI Backends | ** (50051/tcp) |
-| AI Web Services | 1k (5000/tcp) |
-| Attack Cost | **1.5 min** per 100 /64 prefixes |
-| Average Exposure Window | **35 hours** |
-
 ## 🎯 Quick Start
 
 ### 1. Install Dependencies
