@@ -157,38 +157,6 @@ python analysis_scripts/honeypot_detector.py \
   --threshold 0.9
 ```
 
----
-
-## 📊 Key Results
-
-### CERNET2 Exposure Baseline
-
-```
-Total Scanned: 530,000+ IPv6 addresses
-Unique Exposed IPs: 1,347
-AI Port Ratio: 60.8%
-```
-
-### Persistence Analysis
-
-```
-Snapshot Period: 2026-07-11 to 2026-07-18
-Snapshots Analyzed: 4
-
-Persistence Rates:
-├── gRPC AI (50051): 73.7% - Stable inference services
-├── Ollama (11434): 100% - Stable deployments
-└── AI Web (5000): 9.7% - Temporary dev environments
-```
-
-### Honeypot Detection
-
-```
-Detection Method: Port exposure entropy analysis
-Threshold: H > 0.9 (normalized entropy)
-Result: 60%-96% of global AI exposure is honeypot
----
-
 ## 🛠️ Deployment
 
 ### Measurement Node
