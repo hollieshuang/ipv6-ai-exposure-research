@@ -12,28 +12,18 @@
 
 ## 📖 Overview
 
-This repository contains the **first systematic measurement** of IPv6 AI infrastructure exposure, including detection rules, analysis scripts, and datasets from our research published at [USENIX Security 2027].
+This repository contains the **first systematic measurement** of IPv6 AI infrastructure exposure, including detection rules, analysis scripts, and datasets from our research published .
 
 ### Key Findings
 
 | Metric | Value |
 |--------|-------|
-| Scanned IPv6 Addresses | 530,000+ |
-| Exposed AI Endpoints | 1,347 |
-| Ollama Servers | 4 (11434/tcp) |
-| gRPC AI Backends | 30 (50051/tcp) |
-| AI Web Services | 1,067 (5000/tcp) |
+| Exposed AI Endpoints | 1k |
+| Ollama Servers | * (11434/tcp) |
+| gRPC AI Backends | ** (50051/tcp) |
+| AI Web Services | 1k (5000/tcp) |
 | Attack Cost | **1.5 min** per 100 /64 prefixes |
 | Average Exposure Window | **35 hours** |
-
-### Research Paper
-
-```
-"Unveiling the Hidden Attack Surface: Large-scale Measurement of IPv6 AI Infrastructure Exposure"
-Anonymous Submission, USENIX Security 2027
-```
-
----
 
 ## 🎯 Quick Start
 
@@ -125,23 +115,9 @@ ipv6-ai-exposure-research/
 
 | SID | Service | Detection | Severity |
 |-----|---------|----------|----------|
-| 9000001 | Ollama | Model enumeration (/api/tags) | HIGH |
-| 9000002 | Ollama | Inference abuse (/api/generate) | CRITICAL |
-| 9000003 | Ollama | Model download (/api/pull) | CRITICAL |
-| 9000004 | Ollama | Version disclosure (/api/version) | MEDIUM |
-| 9000005 | gRPC | HTTP/2 connection probe | MEDIUM |
-| 9000006 | gRPC | Plaintext (no TLS) | HIGH |
-| 9000007 | OpenClaw | Endpoint exposure | MEDIUM |
-| 9000008 | OpenClaw | WebSocket connection | HIGH |
-| 9000009 | vLLM | Model enumeration (/v1/models) | HIGH |
-| 9000010 | vLLM | Inference abuse (/v1/chat/completions) | CRITICAL |
-| 9000011 | AI Web | Flask/Gradio exposure | MEDIUM |
-| 9000012 | MySQL | Database+AI co-exposure | CRITICAL |
-| 9000013 | Redis | Redis+AI co-exposure | HIGH |
-| 9000014 | Ollama | DoS attack (high-frequency) | MEDIUM |
-| 9000015 | Ollama | CVE-2024-37032 (RCE) | CRITICAL |
-| 9000016 | Ollama | CVE-2024-39720 (file read) | HIGH |
-| 9000017 | Generic | IPv6 AI scanning pattern | MEDIUM |
+| 000001 | Ollama | Model enumeration (/api/tags) | HIGH |
+………………
+| 000017 | Generic | IPv6 AI scanning pattern | MEDIUM |
 
 ### Zeek Scripts
 
@@ -168,7 +144,7 @@ IPv6 AI service scanner using masscan:
 ```bash
 python analysis_scripts/masscan_ipv6_ai_scan.py \
   --target 2402:e740::/48 \
-  --rate 22000 \
+  --rate 20000 \
   --output scan_results.json
 ```
 
@@ -202,13 +178,6 @@ python analysis_scripts/honeypot_detector.py \
 Total Scanned: 530,000+ IPv6 addresses
 Unique Exposed IPs: 1,347
 AI Port Ratio: 60.8%
-
-Service Breakdown:
-├── Ollama (11434): 4 instances
-├── gRPC AI (50051): 30 instances
-├── AI Web (5000): 1,067 instances
-├── OpenClaw (18789): 3 instances
-└── Other AI: 35 instances
 ```
 
 ### Persistence Analysis
@@ -229,18 +198,11 @@ Persistence Rates:
 Detection Method: Port exposure entropy analysis
 Threshold: H > 0.9 (normalized entropy)
 Result: 60%-96% of global AI exposure is honeypot
-
-Detected Honeypot Prefixes:
-├── fffe::/16 (H=0.9471)
-├── col0::/24
-└── one1::/24
-```
-
 ---
 
 ## 🛠️ Deployment
 
-### CERNET2 Measurement Node
+### Measurement Node
 
 See [DEPLOYMENT_CERNET2.md](deployment/DEPLOYMENT_CERNET2.md) for detailed instructions.
 
@@ -274,22 +236,6 @@ python analysis_scripts/masscan_ipv6_ai_scan.py --config scan_config.conf
 | [Architecture](docs/architecture.md) | System architecture overview |
 | [Ethics Statement](docs/ethics_statement.md) | Research ethics |
 | [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions |
-
----
-
-## 🎓 Citation
-
-If you use this research or code in your work, please cite:
-
-```bibtex
-@article{ipv6-ai-exposure-2026,
-  title={Unveiling the Hidden Attack Surface: Large-scale Measurement of IPv6 AI Infrastructure Exposure},
-  author={Anonymous Authors},
-  booktitle={USENIX Security Symposium 2027},
-  year={2027},
-  note={Anonymous Submission}
-}
-```
 
 ---
 
